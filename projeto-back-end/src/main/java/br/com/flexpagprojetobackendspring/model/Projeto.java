@@ -14,6 +14,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -44,5 +45,6 @@ public class Projeto implements Serializable {
     @NotBlank
     @NotNull
     @Column(length = 10)
+    @Pattern(regexp = "Ativo|Inativo")
     private String status = "Ativo";
 }
