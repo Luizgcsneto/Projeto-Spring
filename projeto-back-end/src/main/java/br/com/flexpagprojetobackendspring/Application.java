@@ -22,8 +22,8 @@ public class Application {
 		return args -> {
 			projetoRepository.deleteAll();
 			Projeto projeto = new Projeto();
-			projeto.setName("GVT");
-			projeto.setCategory("Embratel");
+			projeto.setName("Java");
+			projeto.setCategory("Back-end");
 			projetoRepository.save(projeto);
 		};
 	}

@@ -1,7 +1,9 @@
 package br.com.flexpagprojetobackendspring.model;
+
 import java.io.Serializable;
 
-import org.hibernate.validator.constraints.Length;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -12,11 +14,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 @Entity
 @Data
+@Accessors(chain = true)
+@SQLDelete(sql = "UPDATE Projeto SET status = 'Inativo' WHERE id = ?")
+@Where(clause = "status = 'Ativo'")
 public class Projeto implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -26,17 +31,18 @@ public class Projeto implements Serializable {
     @JsonProperty("_id")
     private Long id;
 
-    @NotBlank(message = "Nome não pode estar vazio")
+    @NotBlank
     @NotNull
-  //  @Length(min = 5, max = 100)
-   // @Size(min = 5, max = 100)
-   @Column(length = 100)
+    @Column(length = 100)
     private String name;
 
-    @NotBlank(message = "Categoria não pode estar vazio")
+    @NotBlank
     @NotNull
-   // @Length(max = 12)
-    //@Size(max = 12)
     @Column(length = 20)
     private String category;
+
+    @NotBlank
+    @NotNull
+    @Column(length = 10)
+    private String status = "Ativo";
 }

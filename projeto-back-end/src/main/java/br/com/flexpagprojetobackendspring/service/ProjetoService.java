@@ -6,14 +6,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import br.com.flexpagprojetobackendspring.dtos.ProjetoDto;
 import br.com.flexpagprojetobackendspring.model.Projeto;
 import br.com.flexpagprojetobackendspring.repository.ProjetoRepository;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 
+@Validated
 @Component
 public class ProjetoService {
 
@@ -25,20 +28,20 @@ public class ProjetoService {
         return projetoRepository.findAll();
     }
 
-    public ResponseEntity<Projeto> findById(@PathVariable @Positive Long id)
+    public ResponseEntity<Projeto> findById(@PathVariable Long id)
     {
         return projetoRepository.findById(id)
         .map(project -> ResponseEntity.ok().body(project))
         .orElse(ResponseEntity.notFound().build());
     }
 
-    public ResponseEntity<Projeto> create(@Valid @RequestBody Projeto projeto)
+    public ResponseEntity<Projeto> create(@RequestBody Projeto projeto)
     {
         Projeto projetoEntity = projetoRepository.save(projeto);
         return new ResponseEntity<Projeto>(projetoEntity, HttpStatus.CREATED);
     }
 
-    public ResponseEntity<Projeto> update(@Valid @PathVariable Long id, @RequestBody Projeto projeto)
+    public ResponseEntity<Projeto> update(@PathVariable Long id, @RequestBody Projeto projeto)
     {
         return projetoRepository.findById(id).map(projetoFound ->{
             projetoFound.setName(projeto.getName());
@@ -48,13 +51,12 @@ public class ProjetoService {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    public ResponseEntity<Void> delete(@PathVariable @Positive Long id){
+    public ResponseEntity<Void> delete(@PathVariable Long id)
+    {
         return projetoRepository.findById(id).map(projetoFound -> {
             projetoRepository.deleteById(id);
             return ResponseEntity.noContent().<Void>build();
         }).orElse(ResponseEntity.notFound().build());
     }
 
-
-    
 }
