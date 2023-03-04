@@ -11,6 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import br.com.flexpagprojetobackendspring.exception.RecordNotFoundException;
 import br.com.flexpagprojetobackendspring.model.Projeto;
 import br.com.flexpagprojetobackendspring.repository.ProjetoRepository;
 import jakarta.validation.Valid;
@@ -35,9 +36,10 @@ public class ProjetoService {
         return projetoRepository.findAll();
     }
 
-    public Optional<Projeto> findById(@PathVariable Long id)
+    public Projeto findById(@PathVariable Long id)
     {
-        return projetoRepository.findById(id);
+        return projetoRepository.findById(id)
+            .orElseThrow(() -> new RecordNotFoundException(id));
     }
 
     public Projeto create(@Valid Projeto projeto)
@@ -45,21 +47,19 @@ public class ProjetoService {
         return projetoRepository.save(projeto);
     }
 
-    public Optional<Projeto> update(@NotNull @Positive Long id, @Valid Projeto projeto)
+    public Projeto update(@NotNull @Positive Long id, @Valid Projeto projeto)
     {
         return projetoRepository.findById(id).map(projetoFound ->{
             projetoFound.setName(projeto.getName());
             projetoFound.setCategory(projeto.getCategory());
               return projetoRepository.save(projetoFound);
-            });
+            }).orElseThrow(() -> new RecordNotFoundException(id));
     }
 
-    public boolean delete(@PathVariable Long id)
+    public void delete(@PathVariable Long id)
     {
-        return projetoRepository.findById(id).map(projetoFound -> {
-            projetoRepository.deleteById(id);
-            return true;
-        }).orElse(false);
+        projetoRepository.delete(projetoRepository.findById(id)
+            .orElseThrow(() -> new RecordNotFoundException(id)));
     }
 
 }
