@@ -1,11 +1,15 @@
 package br.com.flexpagprojetobackendspring.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
+
+import br.com.flexpagprojetobackendspring.dtos.ProjetoDto;
+import br.com.flexpagprojetobackendspring.dtos.mapper.ProjetoMapper;
 import br.com.flexpagprojetobackendspring.exception.RecordNotFoundException;
-import br.com.flexpagprojetobackendspring.model.Projeto;
 import br.com.flexpagprojetobackendspring.repository.ProjetoRepository;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -15,43 +19,48 @@ import jakarta.validation.constraints.Positive;
 @Service
 public class ProjetoService {
 
-    
     private final ProjetoRepository projetoRepository;
+    private final ProjetoMapper projetoMapper;
 
-    public ProjetoService (ProjetoRepository projetoRepository)
-    {
+    public ProjetoService(
+        ProjetoRepository projetoRepository, 
+        ProjetoMapper projetoMapper) {
         this.projetoRepository = projetoRepository;
+        this.projetoMapper = projetoMapper;
     }
 
-    public List<Projeto> listProjects()
+    public List<ProjetoDto> listProjects() 
     {
-        return projetoRepository.findAll();
+        return projetoRepository.findAll()
+        .stream().map(projetoMapper::toDto)
+        .collect(Collectors.toList());
     }
 
-    public Projeto findById(@PathVariable Long id)
+    public ProjetoDto findById(@PathVariable Long id) 
     {
-        return projetoRepository.findById(id)
-            .orElseThrow(() -> new RecordNotFoundException(id));
+        return projetoRepository.findById(id).map(projetoMapper::toDto)
+                .orElseThrow(() -> new RecordNotFoundException(id));
     }
 
-    public Projeto create(@Valid Projeto projeto)
+    public ProjetoDto create(@Valid @NotNull ProjetoDto projeto) 
     {
-        return projetoRepository.save(projeto);
+        return projetoMapper.toDto(projetoRepository
+        .save(projetoMapper.toEntity(projeto)));
     }
 
-    public Projeto update(@NotNull @Positive Long id, @Valid Projeto projeto)
+    public ProjetoDto update(@NotNull @Positive Long id, @Valid @NotNull ProjetoDto projeto) 
     {
-        return projetoRepository.findById(id).map(projetoFound ->{
-            projetoFound.setName(projeto.getName());
-            projetoFound.setCategory(projeto.getCategory());
-              return projetoRepository.save(projetoFound);
-            }).orElseThrow(() -> new RecordNotFoundException(id));
+        return projetoRepository.findById(id).map(projetoFound -> {
+            projetoFound.setName(projeto.name());
+            projetoFound.setCategory(projeto.category());
+            return projetoMapper.toDto(projetoRepository.save(projetoMapper.toEntity(projeto)));
+        }).orElseThrow(() -> new RecordNotFoundException(id));
     }
 
-    public void delete(@PathVariable Long id)
+    public void delete(@PathVariable Long id) 
     {
         projetoRepository.delete(projetoRepository.findById(id)
-            .orElseThrow(() -> new RecordNotFoundException(id)));
+                .orElseThrow(() -> new RecordNotFoundException(id)));
     }
 
 }

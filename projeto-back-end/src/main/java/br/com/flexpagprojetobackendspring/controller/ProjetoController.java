@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.flexpagprojetobackendspring.model.Projeto;
+import br.com.flexpagprojetobackendspring.dtos.ProjetoDto;
 import br.com.flexpagprojetobackendspring.service.ProjetoService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -34,27 +34,27 @@ public class ProjetoController {
 
     @GetMapping
     @ResponseBody
-    public List<Projeto> listProjects() {
+    public List<ProjetoDto> listProjects() {
         return projetoService.listProjects();
     }
 
     @GetMapping("/{id}")
-    public Projeto findById(@PathVariable @NotNull @Positive Long id) 
+    public ProjetoDto findById(@PathVariable @NotNull @Positive Long id) 
     {
         return projetoService.findById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Projeto create(@RequestBody @Valid Projeto projeto) 
+    public ProjetoDto create(@RequestBody @Valid ProjetoDto projeto) 
     {
         return  projetoService.create(projeto);
     }
 
     @PutMapping("/{id}")
     @ResponseBody
-    public Projeto update(@PathVariable @NotNull @Positive Long id,
-            @RequestBody @Valid Projeto projeto) {
+    public ProjetoDto update(@PathVariable @NotNull @Positive Long id,
+            @RequestBody @Valid @NotNull ProjetoDto projeto) {
         return projetoService.update(id, projeto);
     }
 
